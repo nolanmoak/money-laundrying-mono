@@ -1,9 +1,8 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -11,22 +10,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
 }
+
+app.UseHttpsRedirection();
 
 // Enable static file serving from wwwroot (for Flutter build)
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-if (!app.Environment.IsDevelopment()) {
-    app.UseHttpsRedirection();
-}
-
 // Map API controllers
 app.MapControllers();
-
-// Fallback to Flutter app index.html for non-API routes
-// app.MapFallbackToFile("index.html");
 
 app.Run();

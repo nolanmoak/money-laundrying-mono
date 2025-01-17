@@ -24,8 +24,5 @@ ehthumbs.db
 # NuGet
 .nuget/
 
-# JetBrains Rider settings
-.idea/
-
 # macOS-specific files
 .DS_Store
