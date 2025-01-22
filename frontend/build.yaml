@@ -1,0 +1,14 @@
+targets:
+  $default:
+    sources:
+     - openapi/**
+    builders:
+      swagger_dart_code_generator:
+        options:
+          input_folder: ./openapi
+          output_folder: ./lib/generated
+          use_required_attributes: true
+          include_null_fields: true
+          use_inheritance: true
+          include_if_null: true
+          date_formatter: true

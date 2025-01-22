@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data.dart';
+import 'package:frontend/generated/spec.swagger.dart';
 
 int getNextWeekday(int weekday) {
   if (weekday >= 7) {
@@ -10,12 +10,12 @@ int getNextWeekday(int weekday) {
 
 const winterMonths = [11, 12, 1, 2, 3, 4];
 
-PeakDataEntry? getPeakDataEntryForWeekday(DateTime dateTime, int weekday) {
-  var peakData = peakDataSummer;
-  if (winterMonths.contains(dateTime.month)) {
-    peakData = peakDataWinter;
-  }
-  return peakData[weekday];
+List<PeakDataEntry> getPeakDataEntriesForWeekday(
+    DataModel data, DateTime dateTime, int weekday) {
+  return data.data
+      .where((peakDataDay) => peakDataDay.dayOfWeek == weekday)
+      .first
+      .entries;
 }
 
 typedef ParsedPeakData = ({
@@ -25,18 +25,27 @@ typedef ParsedPeakData = ({
   Color color
 });
 
-List<ParsedPeakData> parsePeakData(PeakDataEntry peakDataEntry) {
-  final offPeakTimes = peakDataEntry[PeakDataType.off];
-  final midPeakTimes = peakDataEntry[PeakDataType.mid];
-  final onPeakTimes = peakDataEntry[PeakDataType.on];
+List<ParsedPeakData> parsePeakData(List<PeakDataEntry> peakDataEntries) {
+  final offPeakTimes = peakDataEntries
+      .where((entry) => entry.type == PeakDataType.off)
+      .firstOrNull
+      ?.ranges;
+  final midPeakTimes = peakDataEntries
+      .where((entry) => entry.type == PeakDataType.mid)
+      .firstOrNull
+      ?.ranges;
+  final onPeakTimes = peakDataEntries
+      .where((entry) => entry.type == PeakDataType.on)
+      .firstOrNull
+      ?.ranges;
   if (offPeakTimes == null || midPeakTimes == null || onPeakTimes == null) {
     throw Exception('Unable to parse peak time data for entry');
   }
   return parsePeakDataLists(offPeakTimes, midPeakTimes, onPeakTimes);
 }
 
-List<ParsedPeakData> parsePeakDataLists(PeakDataList offPeakTimes,
-    PeakDataList midPeakTimes, PeakDataList onPeakTimes) {
+List<ParsedPeakData> parsePeakDataLists(List<PeakDataHourRange> offPeakTimes,
+    List<PeakDataHourRange> midPeakTimes, List<PeakDataHourRange> onPeakTimes) {
   return [
     ...offPeakTimes.map((time) {
       return (
@@ -78,6 +87,10 @@ int getHoursUntilNextPeak(int currentHour, int nextPeakHour) {
   return getHoursBetweenPeaks(currentHour, nextPeakHour) - 1;
 }
 
+bool isBetween(int a, int b, int value) {
+  return value >= a && value < b;
+}
+
 String get24HourDisplay(int hour) {
   var displayHour = hour;
   var period = 'AM';
@@ -93,4 +106,40 @@ String get24HourDisplay(int hour) {
     period = 'PM';
   }
   return '$displayHour $period';
+}
+
+typedef DeltaTime = ({int hours, int minutes, int seconds});
+
+DeltaTime getDeltaTimeUntilNextPeak(DateTime dateTime, int nextPeakStartHour) {
+  final hoursBetweenPeaks =
+      getHoursBetweenPeaks(dateTime.hour, nextPeakStartHour);
+  final hours = (hoursBetweenPeaks.toDouble() -
+          dateTime.minute.toDouble() / 60 -
+          dateTime.second.toDouble() / 60 / 60)
+      .floor();
+
+  var minutes =
+      ((60 - dateTime.minute).toDouble() - dateTime.second.toDouble() / 60)
+          .floor();
+  if (minutes == 60) {
+    minutes = 0;
+  }
+
+  final seconds = dateTime.second == 0 ? 0 : 60 - dateTime.second;
+
+  return (
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds,
+  );
+}
+
+double getDatetimeFraction(DateTime dateTime) {
+  return dateTime.hour.toDouble() / 24 +
+      dateTime.minute.toDouble() / 60 / 24 +
+      dateTime.second.toDouble() / 60 / 60 / 24;
+}
+
+String formatDeltaTime(DeltaTime deltaTime) {
+  return '${deltaTime.hours.toString().padLeft(2, '0')}:${deltaTime.minutes.toString().padLeft(2, '0')}:${deltaTime.seconds.toString().padLeft(2, '0')}';
 }
