@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/components/current_time.dart';
 import 'package:frontend/components/dial.dart';
 import 'package:frontend/components/electricity_company_link.dart';
 import 'package:frontend/components/location_company_dropdown.dart';
@@ -117,8 +118,14 @@ class _HomeRouteState extends State<HomeRoute> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            ElectricityCompanyLink(
-                selectedLocationAndCompany: selectedLocationAndCompany),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CurrentTime(),
+                ElectricityCompanyLink(
+                    selectedLocationAndCompany: selectedLocationAndCompany),
+              ],
+            ),
             Expanded(
               child: Dial(
                 data: currentPeakData,

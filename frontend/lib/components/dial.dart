@@ -7,7 +7,6 @@ import 'package:frontend/generated/spec.swagger.dart';
 import 'package:frontend/utils/data_utils.dart';
 import 'package:frontend/utils/date_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 
 class Dial extends StatefulWidget {
   const Dial({super.key, required this.data});
@@ -27,13 +26,11 @@ class _DialState extends State<Dial> {
   Color? currentPeakColor;
   String? nextPeak;
   Color? nextPeakColor;
-  String currentTimeText = '----';
   DeltaTime? timeUntilNextPeak;
 
   void _onPeriodicUpdate() {
     setState(() {
       final dateTime = DateTime.now();
-      currentTimeText = DateFormat('EEEE, MMM. dd, h:mm:ss a').format(dateTime);
       currentTimeFraction = getDatetimeFraction(dateTime);
       if (data == null) {
         return;
@@ -113,15 +110,6 @@ class _DialState extends State<Dial> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              currentTimeText,
-              style: const TextStyle(fontSize: 40),
-            ),
-          ],
-        ),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(40.0),
@@ -236,7 +224,7 @@ class _DialState extends State<Dial> {
           children: [
             const Text('Current Status: ', style: TextStyle(fontSize: 40)),
             Text(
-              '$currentPeak Peak',
+              currentPeak != null ? '$currentPeak Peak' : 'Unknown',
               style: TextStyle(color: currentPeakColor, fontSize: 40),
             ),
           ],
@@ -246,14 +234,16 @@ class _DialState extends State<Dial> {
           children: [
             const Text('Next Status: ', style: TextStyle(fontSize: 40)),
             Text(
-              '$nextPeak Peak ',
+              nextPeak != null ? '$nextPeak Peak ' : 'Unknown',
               style: TextStyle(color: nextPeakColor, fontSize: 40),
             ),
-            const Text('in ', style: TextStyle(fontSize: 40)),
-            Text(
-              formatDeltaTime(timeUntilNextPeak),
-              style: GoogleFonts.jetBrainsMono(fontSize: 40),
-            ),
+            if (nextPeak != null)
+              const Text('in ', style: TextStyle(fontSize: 40)),
+            if (timeUntilNextPeak != null)
+              Text(
+                formatDeltaTime(timeUntilNextPeak),
+                style: GoogleFonts.jetBrainsMono(fontSize: 40),
+              ),
           ],
         ),
       ],
