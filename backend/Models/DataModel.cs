@@ -1,9 +1,6 @@
+using backend.Db;
+
 namespace backend.Models {
-  public enum PeakDataType {
-    Off,
-    Mid,
-    On
-  }
 
   public class PeakDataHourRange {
     public required int Start { get; set; }
@@ -12,15 +9,15 @@ namespace backend.Models {
 
   public class PeakDataEntry {
     public required PeakDataType Type { get; set; }
-    public required List<PeakDataHourRange> Ranges { get; set; }
+    public required IEnumerable<PeakDataHourRange> Ranges { get; set; }
   }
 
   public class PeakDataDay {
     public required int DayOfWeek { get; set; }
-    public required List<PeakDataEntry> Entries { get; set; }
+    public required IEnumerable<PeakDataEntry> Entries { get; set; }
   }
 
   public class DataModel {
-    public required List<PeakDataDay> Data { get; set; }
+    public required IEnumerable<PeakDataDay> Data { get; set; }
   }
 }

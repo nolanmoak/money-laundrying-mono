@@ -19,24 +19,21 @@ final class _$Spec extends Spec {
   final Type definitionType = Spec;
 
   @override
-  Future<Response<DataModel>> _apiDataGet() {
+  Future<Response<DataModel>> _apiDataGet({
+    num? latitude,
+    num? longitude,
+  }) {
     final Uri $url = Uri.parse('/api/Data');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'latitude': latitude,
+      'longitude': longitude,
+    };
     final Request $request = Request(
       'GET',
       $url,
       client.baseUrl,
+      parameters: $params,
     );
     return client.send<DataModel, DataModel>($request);
-  }
-
-  @override
-  Future<Response<dynamic>> _apiTestHelloGet() {
-    final Uri $url = Uri.parse('/api/Test/hello');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
-    return client.send<dynamic, dynamic>($request);
   }
 }

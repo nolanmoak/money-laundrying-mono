@@ -1,14 +1,25 @@
-using Microsoft.AspNetCore.OpenApi;
+using backend.Configuration;
+using backend.Db;
+using backend.Services;
 using Microsoft.OpenApi.Any;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Add secrets (not tracked by github)
+builder.Configuration.AddJsonFile($"secrets{(builder.Environment.IsProduction() ? "" : $".{builder.Environment.EnvironmentName}")}.json");
+
+builder.Services.AddLogging().AddHttpLogging();
+
+// Database
+builder.Services.AddDbContext<ApplicationDbContext>();
+
+// Controllers
 builder.Services.AddControllers().AddJsonOptions(options => {
   options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+
+// Open API
 builder.Services.AddOpenApi(options => {
   options.AddSchemaTransformer((schema, context, cancellationToken) => {
     if (context.JsonTypeInfo.Type.IsEnum) {
@@ -18,6 +29,11 @@ builder.Services.AddOpenApi(options => {
     return Task.CompletedTask;
   });
 });
+
+// Config
+builder.Services.Configure<GoogleMapsConfig>(builder.Configuration.GetSection("GoogleMaps"));
+
+builder.Services.AddTransient<IGeocodingService, GeocodingService>();
 
 var app = builder.Build();
 

@@ -47,24 +47,25 @@ abstract class Spec extends ChopperService {
   }
 
   ///
-  Future<chopper.Response<DataModel>> apiDataGet() {
+  ///@param latitude
+  ///@param longitude
+  Future<chopper.Response<DataModel>> apiDataGet({
+    num? latitude,
+    num? longitude,
+  }) {
     generatedMapping.putIfAbsent(DataModel, () => DataModel.fromJsonFactory);
 
-    return _apiDataGet();
+    return _apiDataGet(latitude: latitude, longitude: longitude);
   }
 
   ///
+  ///@param latitude
+  ///@param longitude
   @Get(path: '/api/Data')
-  Future<chopper.Response<DataModel>> _apiDataGet();
-
-  ///
-  Future<chopper.Response> apiTestHelloGet() {
-    return _apiTestHelloGet();
-  }
-
-  ///
-  @Get(path: '/api/Test/hello')
-  Future<chopper.Response> _apiTestHelloGet();
+  Future<chopper.Response<DataModel>> _apiDataGet({
+    @Query('latitude') num? latitude,
+    @Query('longitude') num? longitude,
+  });
 }
 
 @JsonSerializable(explicitToJson: true)

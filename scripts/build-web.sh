@@ -24,6 +24,11 @@ cp -r $FLUTTER_DIR/build/web/* $WWWROOT_DIR/
 # Step 3: Build the .NET backend
 echo "Building .NET backend..."
 cd $BACKEND_DIR
+dotnet clean
+if [ $? -ne 0 ]; then
+    echo ".NET build failed!"
+    exit 1
+fi
 dotnet build -c Release
 if [ $? -ne 0 ]; then
     echo ".NET build failed!"

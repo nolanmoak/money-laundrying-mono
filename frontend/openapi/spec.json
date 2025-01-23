@@ -12,8 +12,24 @@
   "paths": {
     "/api/Data": {
       "get": {
-        "tags": [
-          "Data"
+        "tags": ["Data"],
+        "parameters": [
+          {
+            "name": "latitude",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -38,26 +54,12 @@
           }
         }
       }
-    },
-    "/api/Test/hello": {
-      "get": {
-        "tags": [
-          "Test"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
     }
   },
   "components": {
     "schemas": {
       "DataModel": {
-        "required": [
-          "data"
-        ],
+        "required": ["data"],
         "type": "object",
         "properties": {
           "data": {
@@ -69,10 +71,7 @@
         }
       },
       "PeakDataDay": {
-        "required": [
-          "dayOfWeek",
-          "entries"
-        ],
+        "required": ["dayOfWeek", "entries"],
         "type": "object",
         "properties": {
           "dayOfWeek": {
@@ -88,10 +87,7 @@
         }
       },
       "PeakDataEntry": {
-        "required": [
-          "type",
-          "ranges"
-        ],
+        "required": ["type", "ranges"],
         "type": "object",
         "properties": {
           "type": {
@@ -106,10 +102,7 @@
         }
       },
       "PeakDataHourRange": {
-        "required": [
-          "start",
-          "end"
-        ],
+        "required": ["start", "end"],
         "type": "object",
         "properties": {
           "start": {
@@ -123,11 +116,7 @@
         }
       },
       "PeakDataType": {
-        "enum": [
-          "Off",
-          "Mid",
-          "On"
-        ],
+        "enum": ["Off", "Mid", "On"],
         "type": "string"
       }
     }
@@ -135,9 +124,6 @@
   "tags": [
     {
       "name": "Data"
-    },
-    {
-      "name": "Test"
     }
   ]
 }

@@ -55,7 +55,6 @@ class MyHomePage extends StatefulWidget {
 
 typedef MyHomePageData = ({
   DataModel peakData,
-  Position position,
 });
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -69,13 +68,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<MyHomePageData> getHomePageData() async {
-    final data = await getData();
-    final pos = await determinePosition();
-    return (peakData: data, position: pos);
+    final position = await determinePosition();
+    final data = await getData(position);
+    return (peakData: data);
   }
 
-  Future<DataModel> getData() async {
-    final response = await dataSpec.apiDataGet();
+  Future<DataModel> getData(Position? position) async {
+    final response = await dataSpec.apiDataGet(
+      latitude: position?.latitude,
+      longitude: position?.longitude,
+    );
     final responseBody = response.body;
     if (responseBody == null) {
       throw Exception('Unable to load data');
@@ -104,11 +106,9 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (context, snapshot) {
             Widget child;
             DataModel? data = snapshot.data?.peakData;
-            Position? position = snapshot.data?.position;
-            if (snapshot.hasData && data != null && position != null) {
+            if (snapshot.hasData && data != null) {
               child = Dial(
                 data: data,
-                position: position,
               );
             } else if (snapshot.hasError) {
               child = Center(
@@ -187,10 +187,9 @@ class MyPainter extends CustomPainter {
 }
 
 class Dial extends StatefulWidget {
-  const Dial({super.key, required this.data, required this.position});
+  const Dial({super.key, required this.data});
 
   final DataModel data;
-  final Position position;
 
   @override
   State<Dial> createState() => _DialState();
@@ -260,7 +259,12 @@ class _DialState extends State<Dial> {
     super.initState();
     data = widget.data;
     _onPeriodicUpdate();
-    Timer.periodic(const Duration(seconds: 1), (_) => _onPeriodicUpdate());
+    Timer.periodic(
+      const Duration(
+        milliseconds: 100,
+      ),
+      (_) => _onPeriodicUpdate(),
+    );
   }
 
   @override
