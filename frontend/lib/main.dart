@@ -12,6 +12,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:html' as html;
 
 late final String apiUrl;
 
@@ -260,7 +261,9 @@ class _DialState extends State<Dial> {
 
   Future<void> _openUrl(String url) async {
     final Uri uri = Uri.parse(url);
-    if (kIsWeb || (await canLaunchUrl(uri))) {
+    if (kIsWeb) {
+      html.window.open(url, '_blank');
+    } else if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       return Future.error('Could not launch $url');
