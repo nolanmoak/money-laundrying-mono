@@ -5,6 +5,7 @@ namespace backend.Models {
   public class PeakDataElectricityCompany {
     public required string Name { get; set; }
     public required string Url { get; set; }
+    public required IEnumerable<PeakDataDay> Days { get; set; }
   }
 
   public class PeakDataHourRange {
@@ -23,12 +24,11 @@ namespace backend.Models {
   }
 
   public class DataModel {
-    public required IEnumerable<PeakDataDay> Days { get; set; }
     public required string City { get; set; }
     public required string State { get; set; }
     public required string StateCode { get; set; }
     public required string Country { get; set; }
     public required string CountryCode { get; set; }
-    public required PeakDataElectricityCompany ElectricityCompany { get; set; }
+    public required IEnumerable<PeakDataElectricityCompany> ElectricityCompanies { get; set; }
   }
 }

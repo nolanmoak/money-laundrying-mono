@@ -12,7 +12,7 @@ const winterMonths = [11, 12, 1, 2, 3, 4];
 
 List<PeakDataEntry>? getPeakDataEntriesForWeekday(
     DataModel data, DateTime dateTime, int weekday) {
-  return data.days
+  return data.electricityCompanies[0].days
       .where((peakDataDay) => peakDataDay.dayOfWeek == weekday)
       .firstOrNull
       ?.entries;

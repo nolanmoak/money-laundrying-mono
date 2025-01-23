@@ -305,13 +305,13 @@ class _DialState extends State<Dial> {
                   ],
                 ),
                 TextButton(
-                  onPressed: () => _openUrl(data.electricityCompany.url),
+                  onPressed: () => _openUrl(data.electricityCompanies[0].url),
                   child: Row(
                     spacing: 2,
                     children: [
                       const Icon(Icons.open_in_new, size: 40),
                       Text(
-                        data.electricityCompany.name,
+                        data.electricityCompanies[0].name,
                         style: const TextStyle(
                           fontSize: 40,
                         ),

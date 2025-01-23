@@ -18,7 +18,7 @@ namespace backend.Db {
     On,
   }
 
-  [Index(nameof(City), [nameof(CountryCode)], IsUnique = true), Index(nameof(ElectricityCompanyId), IsUnique = true)]
+  [Index(nameof(City), [nameof(CountryCode)], IsUnique = true), Index(nameof(City), [nameof(StateCode), nameof(CountryCode)])]
   public class PeakDataLocation : IId {
     [StringLength(100)]
     public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -37,12 +37,7 @@ namespace backend.Db {
     [StringLength(255)]
     public required string CountryCode { get; set; }
 
-    public ElectricityCompany ElectricityCompany { get; set; } = null!;
-
-    [StringLength(100)]
-    public string ElectricityCompanyId { get; set; } = null!;
-
-    public ICollection<PeakDataLocationSeason> Seasons { get; } = [];
+    public ICollection<ElectricityCompany> ElectricityCompanies { get; } = [];
   }
 
   public class ElectricityCompany : IId {
@@ -53,62 +48,66 @@ namespace backend.Db {
     [StringLength(255)]
     public required string Url { get; set; }
 
-    public PeakDataLocation? Location { get; set; }
+    public PeakDataLocation Location { get; set; } = null!;
+
+    [StringLength(100)]
+    public string LocationId { get; set; } = null!;
+    public ICollection<ElectricityCompanySeason> Seasons { get; } = [];
   }
 
-  [Index(nameof(LocationId), [nameof(Season)], IsUnique = true)]
-  public class PeakDataLocationSeason : IId {
+  [Index(nameof(CompanyId), [nameof(Season)], IsUnique = true)]
+  public class ElectricityCompanySeason : IId {
     [StringLength(100)]
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     public required PeakDataSeason Season { get; set; }
 
-    public PeakDataLocation Location { get; set; } = null!;
+    public ElectricityCompany Company { get; set; } = null!;
 
     [StringLength(100)]
-    public string LocationId { get; set; } = null!;
+    public string CompanyId { get; set; } = null!;
 
-    public ICollection<PeakDataLocationSeasonDay> Days { get; } = [];
+    public ICollection<ElectricityCompanySeasonDay> Days { get; } = [];
   }
 
   [Index(nameof(SeasonId), [nameof(Day)], IsUnique = true)]
-  public class PeakDataLocationSeasonDay : IId {
+  public class ElectricityCompanySeasonDay : IId {
     [StringLength(100)]
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     public required int Day { get; set; }
 
-    public PeakDataLocationSeason Season { get; set; } = null!;
+    public ElectricityCompanySeason Season { get; set; } = null!;
 
     [StringLength(100)]
     public string SeasonId { get; set; } = null!;
 
-    public ICollection<PeakDataLocationSeasonDayEntry> Entries { get; } = [];
+    public ICollection<ElectricityCompanySeasonDayEntry> Entries { get; } = [];
   }
 
   [Index(nameof(DayId), [nameof(Type)], IsUnique = true)]
-  public class PeakDataLocationSeasonDayEntry : IId {
+  public class ElectricityCompanySeasonDayEntry : IId {
     [StringLength(100)]
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     public required PeakDataType Type { get; set; }
 
-    public PeakDataLocationSeasonDay Day { get; set; } = null!;
+    public ElectricityCompanySeasonDay Day { get; set; } = null!;
 
     [StringLength(100)]
     public string DayId { get; set; } = null!;
 
-    public ICollection<PeakDataLocationSeasonDayEntryRange> Ranges { get; } = [];
+    public ICollection<ElectricityCompanySeasonDayEntryRange> Ranges { get; } = [];
   }
 
-  public class PeakDataLocationSeasonDayEntryRange : IId {
+  public class ElectricityCompanySeasonDayEntryRange : IId {
     [StringLength(100)]
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     public required int StartHour { get; set; }
     public required int EndHour { get; set; }
 
-    public PeakDataLocationSeasonDayEntry Entry { get; set; } = null!;
+    public ElectricityCompanySeasonDayEntry Entry { get; set; } = null!;
 
     [StringLength(100)]
     public string EntryId { get; set; } = null!;

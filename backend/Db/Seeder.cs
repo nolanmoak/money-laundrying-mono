@@ -5,13 +5,6 @@ namespace backend.Db {
   public static class Seeder {
     public static async Task Seed(DbContext context, CancellationToken cancellationToken = default) {
       Console.WriteLine("Starting Seeder...");
-      ElectricityCompany hydroOttawa = new() {
-        Name = "Hydro Ottawa",
-        Url = "https://hydroottawa.com/en/accounts-services/accounts/rates-conditions/electricity-charge",
-      };
-      await context.Set<ElectricityCompany>().AddAsync(hydroOttawa);
-      await context.SaveChangesAsync();
-      Console.WriteLine($"Added hydro ottawa: {hydroOttawa}");
 
       PeakDataLocation ottawaLocation = new() {
         City = "Ottawa",
@@ -19,27 +12,35 @@ namespace backend.Db {
         StateCode = "ON",
         Country = "Canada",
         CountryCode = "CA",
-        ElectricityCompany = hydroOttawa,
       };
       await context.Set<PeakDataLocation>().AddAsync(ottawaLocation);
       await context.SaveChangesAsync();
       Console.WriteLine($"Added ottawa location: {ottawaLocation}");
 
-      List<PeakDataLocationSeason> seasons = [
+      ElectricityCompany hydroOttawa = new() {
+        Name = "Hydro Ottawa",
+        Url = "https://hydroottawa.com/en/accounts-services/accounts/rates-conditions/electricity-charge",
+        Location = ottawaLocation,
+      };
+      await context.Set<ElectricityCompany>().AddAsync(hydroOttawa);
+      await context.SaveChangesAsync();
+      Console.WriteLine($"Added hydro ottawa: {hydroOttawa}");
+
+      List<ElectricityCompanySeason> seasons = [
         new() {
-          Location = ottawaLocation,
+          Company = hydroOttawa,
           Season = PeakDataSeason.Winter,
         },
         new() {
-          Location = ottawaLocation,
+          Company = hydroOttawa,
           Season = PeakDataSeason.Summer,
         },
       ];
-      await context.Set<PeakDataLocationSeason>().AddRangeAsync(seasons, cancellationToken);
+      await context.Set<ElectricityCompanySeason>().AddRangeAsync(seasons, cancellationToken);
       await context.SaveChangesAsync(cancellationToken);
       Console.WriteLine($"Added seasons: {seasons}");
 
-      List<PeakDataLocationSeasonDay> days = [];
+      List<ElectricityCompanySeasonDay> days = [];
       foreach (var season in seasons) {
         for (int i = 1; i <= 7; i++) {
           days.Add(new() {
@@ -48,11 +49,11 @@ namespace backend.Db {
           });
         }
       }
-      await context.Set<PeakDataLocationSeasonDay>().AddRangeAsync(days, cancellationToken);
+      await context.Set<ElectricityCompanySeasonDay>().AddRangeAsync(days, cancellationToken);
       await context.SaveChangesAsync(cancellationToken);
       Console.WriteLine($"Added days: {days}");
 
-      List<PeakDataLocationSeasonDayEntry> entries = [];
+      List<ElectricityCompanySeasonDayEntry> entries = [];
       foreach (var day in days) {
         entries.AddRange([
         new() {
@@ -68,11 +69,11 @@ namespace backend.Db {
           Day = day,
         }]);
       }
-      await context.Set<PeakDataLocationSeasonDayEntry>().AddRangeAsync(entries, cancellationToken);
+      await context.Set<ElectricityCompanySeasonDayEntry>().AddRangeAsync(entries, cancellationToken);
       await context.SaveChangesAsync(cancellationToken);
       Console.WriteLine($"Added entries: {entries}");
 
-      List<PeakDataLocationSeasonDayEntryRange> ranges = [];
+      List<ElectricityCompanySeasonDayEntryRange> ranges = [];
       foreach (var entry in entries) {
         if (entry.Day.Day >= 6) {
           if (entry.Type == PeakDataType.Off) {
@@ -148,7 +149,7 @@ namespace backend.Db {
           }
         }
       }
-      await context.Set<PeakDataLocationSeasonDayEntryRange>().AddRangeAsync(ranges, cancellationToken);
+      await context.Set<ElectricityCompanySeasonDayEntryRange>().AddRangeAsync(ranges, cancellationToken);
       await context.SaveChangesAsync(cancellationToken);
       Console.WriteLine($"Added ranges: {ranges}");
     }

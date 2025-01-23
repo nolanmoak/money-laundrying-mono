@@ -41,40 +41,44 @@ namespace backend.Controllers {
 
       var data = await (
         from l in _dbContext.Locations
-        join s in _dbContext.LocationSeasons
-          on l.Id equals s.LocationId
-        join elec in _dbContext.ElectricityCompanies
-          on l.ElectricityCompanyId equals elec.Id
-        where l.City == geoLocationResponse.City && l.CountryCode == geoLocationResponse.CountryCode && s.Season == season
+        where l.City == geoLocationResponse.City && l.CountryCode == geoLocationResponse.CountryCode
         select new DataModel {
-          ElectricityCompany = new PeakDataElectricityCompany() {
-            Name = elec.Name,
-            Url = elec.Url,
-          },
           City = l.City,
           State = l.State,
           StateCode = l.StateCode,
           Country = l.Country,
           CountryCode = l.CountryCode,
-          Days = (
-            from d in s.Days
-            select new PeakDataDay {
-              DayOfWeek = d.Day,
-              Entries = (
-                from e in d.Entries
-                select new PeakDataEntry {
-                  Type = e.Type,
-                  Ranges = (
-                    from r in e.Ranges
-                    select new PeakDataHourRange {
-                      Start = r.StartHour,
-                      End = r.EndHour,
+          ElectricityCompanies = (
+            from elec in l.ElectricityCompanies
+            select new PeakDataElectricityCompany() {
+              Name = elec.Name,
+              Url = elec.Url,
+              Days = (
+                from s in elec.Seasons
+                join d in _dbContext.ElectricityCompanySeasonDays
+                  on s.Id equals d.SeasonId
+                where s.Season == season
+                orderby d.Day, d.Id
+                select new PeakDataDay {
+                  DayOfWeek = d.Day,
+                  Entries = (
+                    from e in d.Entries
+                    select new PeakDataEntry {
+                      Type = e.Type,
+                      Ranges = (
+                        from r in e.Ranges
+                        select new PeakDataHourRange {
+                          Start = r.StartHour,
+                          End = r.EndHour,
+                        }
+                      ),
                     }
                   ),
                 }
               ),
             }
           ),
+
         }
       ).FirstOrDefaultAsync();
 

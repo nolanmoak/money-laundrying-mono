@@ -12,9 +12,7 @@
   "paths": {
     "/api/Data": {
       "get": {
-        "tags": [
-          "Data"
-        ],
+        "tags": ["Data"],
         "parameters": [
           {
             "name": "latitude",
@@ -62,22 +60,15 @@
     "schemas": {
       "DataModel": {
         "required": [
-          "days",
           "city",
           "state",
           "stateCode",
           "country",
           "countryCode",
-          "electricityCompany"
+          "electricityCompanies"
         ],
         "type": "object",
         "properties": {
-          "days": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PeakDataDay"
-            }
-          },
           "city": {
             "type": "string"
           },
@@ -93,16 +84,16 @@
           "countryCode": {
             "type": "string"
           },
-          "electricityCompany": {
-            "$ref": "#/components/schemas/PeakDataElectricityCompany"
+          "electricityCompanies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PeakDataElectricityCompany"
+            }
           }
         }
       },
       "PeakDataDay": {
-        "required": [
-          "dayOfWeek",
-          "entries"
-        ],
+        "required": ["dayOfWeek", "entries"],
         "type": "object",
         "properties": {
           "dayOfWeek": {
@@ -118,10 +109,7 @@
         }
       },
       "PeakDataElectricityCompany": {
-        "required": [
-          "name",
-          "url"
-        ],
+        "required": ["name", "url", "days"],
         "type": "object",
         "properties": {
           "name": {
@@ -129,14 +117,17 @@
           },
           "url": {
             "type": "string"
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PeakDataDay"
+            }
           }
         }
       },
       "PeakDataEntry": {
-        "required": [
-          "type",
-          "ranges"
-        ],
+        "required": ["type", "ranges"],
         "type": "object",
         "properties": {
           "type": {
@@ -151,10 +142,7 @@
         }
       },
       "PeakDataHourRange": {
-        "required": [
-          "start",
-          "end"
-        ],
+        "required": ["start", "end"],
         "type": "object",
         "properties": {
           "start": {
@@ -168,11 +156,7 @@
         }
       },
       "PeakDataType": {
-        "enum": [
-          "Off",
-          "Mid",
-          "On"
-        ],
+        "enum": ["Off", "Mid", "On"],
         "type": "string"
       }
     }

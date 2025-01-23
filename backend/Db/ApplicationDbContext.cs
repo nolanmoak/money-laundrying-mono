@@ -3,31 +3,52 @@ using Microsoft.EntityFrameworkCore;
 namespace backend.Db {
 
   public class ApplicationDbContext : DbContext {
-    public DbSet<ElectricityCompany> ElectricityCompanies { get; set; }
     public DbSet<PeakDataLocation> Locations { get; set; }
-    public DbSet<PeakDataLocationSeason> LocationSeasons { get; set; }
-    public DbSet<PeakDataLocationSeasonDay> LocationSeasonDays { get; set; }
-    public DbSet<PeakDataLocationSeasonDayEntry> LocationSeasonDayEntries { get; set; }
-    public DbSet<PeakDataLocationSeasonDayEntryRange> LocationSeasonDayEntryRanges { get; set; }
+    public DbSet<ElectricityCompany> ElectricityCompanies { get; set; }
+    public DbSet<ElectricityCompanySeason> ElectricityCompanySeasons { get; set; }
+    public DbSet<ElectricityCompanySeasonDay> ElectricityCompanySeasonDays { get; set; }
+    public DbSet<ElectricityCompanySeasonDayEntry> ElectricityCompanySeasonDayEntries { get; set; }
+    public DbSet<ElectricityCompanySeasonDayEntryRange> ElectricityCompanySeasonDayEntryRanges { get; set; }
 
-    public string DbPath { get; }
+    public string DbConectionString { get; }
 
     public ApplicationDbContext() {
-      var folder = Environment.SpecialFolder.LocalApplicationData;
-      var path = Environment.GetFolderPath(folder);
-      DbPath = Path.Join(path, "peak_data.db");
+      DbConectionString = GetConnectionString();
     }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
+      DbConectionString = GetConnectionString();
+    }
+
+    private string GetConnectionString() {
+      var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+      if (environment == null) {
+        throw new Exception("Unable to load environment variable ASPNETCORE_ENVIRONMENT");
+      }
+      var configurationBuilder = new ConfigurationBuilder()
+        .SetBasePath(AppContext.BaseDirectory)
+        .AddJsonFile($"appSettings{(environment == "Production" ? "" : $".{environment}")}.json", true)
+        .AddJsonFile($"secrets{(environment == "Production" ? "" : $".{environment}")}.json");
+      var configuration = configurationBuilder.Build();
+
+      var connectionString = configuration.GetConnectionString("MoneyLaundrying");
+      if (connectionString == null) {
+        throw new Exception("Unable to load connection string");
+      }
+      return ParseConnectionString(connectionString);
+    }
+
+    private string ParseConnectionString(string connectionString) {
       var folder = Environment.SpecialFolder.LocalApplicationData;
-      var path = Environment.GetFolderPath(folder);
-      DbPath = Path.Join(path, "peak_data.db");
+      var folderPath = Environment.GetFolderPath(folder);
+      var dbPath = Path.Join(folderPath, "peak_data.db");
+      return connectionString.Replace("{Path}", dbPath);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options) {
       base.OnConfiguring(options);
       options
-        .UseSqlite($"Data Source={DbPath}")
+        .UseSqlite(DbConectionString)
         .UseSeeding((context, _) => {
           Task _task = Seeder.Seed(context);
           _task.Wait();

@@ -71,13 +71,12 @@ abstract class Spec extends ChopperService {
 @JsonSerializable(explicitToJson: true)
 class DataModel {
   const DataModel({
-    required this.days,
     required this.city,
     required this.state,
     required this.stateCode,
     required this.country,
     required this.countryCode,
-    required this.electricityCompany,
+    required this.electricityCompanies,
   });
 
   factory DataModel.fromJson(Map<String, dynamic> json) =>
@@ -86,8 +85,6 @@ class DataModel {
   static const toJsonFactory = _$DataModelToJson;
   Map<String, dynamic> toJson() => _$DataModelToJson(this);
 
-  @JsonKey(name: 'days', includeIfNull: true, defaultValue: <PeakDataDay>[])
-  final List<PeakDataDay> days;
   @JsonKey(name: 'city', includeIfNull: true)
   final String city;
   @JsonKey(name: 'state', includeIfNull: true)
@@ -98,16 +95,17 @@ class DataModel {
   final String country;
   @JsonKey(name: 'countryCode', includeIfNull: true)
   final String countryCode;
-  @JsonKey(name: 'electricityCompany', includeIfNull: true)
-  final PeakDataElectricityCompany electricityCompany;
+  @JsonKey(
+      name: 'electricityCompanies',
+      includeIfNull: true,
+      defaultValue: <PeakDataElectricityCompany>[])
+  final List<PeakDataElectricityCompany> electricityCompanies;
   static const fromJsonFactory = _$DataModelFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is DataModel &&
-            (identical(other.days, days) ||
-                const DeepCollectionEquality().equals(other.days, days)) &&
             (identical(other.city, city) ||
                 const DeepCollectionEquality().equals(other.city, city)) &&
             (identical(other.state, state) ||
@@ -121,9 +119,9 @@ class DataModel {
             (identical(other.countryCode, countryCode) ||
                 const DeepCollectionEquality()
                     .equals(other.countryCode, countryCode)) &&
-            (identical(other.electricityCompany, electricityCompany) ||
+            (identical(other.electricityCompanies, electricityCompanies) ||
                 const DeepCollectionEquality()
-                    .equals(other.electricityCompany, electricityCompany)));
+                    .equals(other.electricityCompanies, electricityCompanies)));
   }
 
   @override
@@ -131,54 +129,50 @@ class DataModel {
 
   @override
   int get hashCode =>
-      const DeepCollectionEquality().hash(days) ^
       const DeepCollectionEquality().hash(city) ^
       const DeepCollectionEquality().hash(state) ^
       const DeepCollectionEquality().hash(stateCode) ^
       const DeepCollectionEquality().hash(country) ^
       const DeepCollectionEquality().hash(countryCode) ^
-      const DeepCollectionEquality().hash(electricityCompany) ^
+      const DeepCollectionEquality().hash(electricityCompanies) ^
       runtimeType.hashCode;
 }
 
 extension $DataModelExtension on DataModel {
   DataModel copyWith(
-      {List<PeakDataDay>? days,
-      String? city,
+      {String? city,
       String? state,
       String? stateCode,
       String? country,
       String? countryCode,
-      PeakDataElectricityCompany? electricityCompany}) {
+      List<PeakDataElectricityCompany>? electricityCompanies}) {
     return DataModel(
-        days: days ?? this.days,
         city: city ?? this.city,
         state: state ?? this.state,
         stateCode: stateCode ?? this.stateCode,
         country: country ?? this.country,
         countryCode: countryCode ?? this.countryCode,
-        electricityCompany: electricityCompany ?? this.electricityCompany);
+        electricityCompanies:
+            electricityCompanies ?? this.electricityCompanies);
   }
 
   DataModel copyWithWrapped(
-      {Wrapped<List<PeakDataDay>>? days,
-      Wrapped<String>? city,
+      {Wrapped<String>? city,
       Wrapped<String>? state,
       Wrapped<String>? stateCode,
       Wrapped<String>? country,
       Wrapped<String>? countryCode,
-      Wrapped<PeakDataElectricityCompany>? electricityCompany}) {
+      Wrapped<List<PeakDataElectricityCompany>>? electricityCompanies}) {
     return DataModel(
-        days: (days != null ? days.value : this.days),
         city: (city != null ? city.value : this.city),
         state: (state != null ? state.value : this.state),
         stateCode: (stateCode != null ? stateCode.value : this.stateCode),
         country: (country != null ? country.value : this.country),
         countryCode:
             (countryCode != null ? countryCode.value : this.countryCode),
-        electricityCompany: (electricityCompany != null
-            ? electricityCompany.value
-            : this.electricityCompany));
+        electricityCompanies: (electricityCompanies != null
+            ? electricityCompanies.value
+            : this.electricityCompanies));
   }
 }
 
@@ -243,6 +237,7 @@ class PeakDataElectricityCompany {
   const PeakDataElectricityCompany({
     required this.name,
     required this.url,
+    required this.days,
   });
 
   factory PeakDataElectricityCompany.fromJson(Map<String, dynamic> json) =>
@@ -255,6 +250,8 @@ class PeakDataElectricityCompany {
   final String name;
   @JsonKey(name: 'url', includeIfNull: true)
   final String url;
+  @JsonKey(name: 'days', includeIfNull: true, defaultValue: <PeakDataDay>[])
+  final List<PeakDataDay> days;
   static const fromJsonFactory = _$PeakDataElectricityCompanyFromJson;
 
   @override
@@ -264,7 +261,9 @@ class PeakDataElectricityCompany {
             (identical(other.name, name) ||
                 const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.url, url) ||
-                const DeepCollectionEquality().equals(other.url, url)));
+                const DeepCollectionEquality().equals(other.url, url)) &&
+            (identical(other.days, days) ||
+                const DeepCollectionEquality().equals(other.days, days)));
   }
 
   @override
@@ -274,20 +273,25 @@ class PeakDataElectricityCompany {
   int get hashCode =>
       const DeepCollectionEquality().hash(name) ^
       const DeepCollectionEquality().hash(url) ^
+      const DeepCollectionEquality().hash(days) ^
       runtimeType.hashCode;
 }
 
 extension $PeakDataElectricityCompanyExtension on PeakDataElectricityCompany {
-  PeakDataElectricityCompany copyWith({String? name, String? url}) {
+  PeakDataElectricityCompany copyWith(
+      {String? name, String? url, List<PeakDataDay>? days}) {
     return PeakDataElectricityCompany(
-        name: name ?? this.name, url: url ?? this.url);
+        name: name ?? this.name, url: url ?? this.url, days: days ?? this.days);
   }
 
   PeakDataElectricityCompany copyWithWrapped(
-      {Wrapped<String>? name, Wrapped<String>? url}) {
+      {Wrapped<String>? name,
+      Wrapped<String>? url,
+      Wrapped<List<PeakDataDay>>? days}) {
     return PeakDataElectricityCompany(
         name: (name != null ? name.value : this.name),
-        url: (url != null ? url.value : this.url));
+        url: (url != null ? url.value : this.url),
+        days: (days != null ? days.value : this.days));
   }
 }
 

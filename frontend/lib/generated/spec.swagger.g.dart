@@ -7,27 +7,26 @@ part of 'spec.swagger.dart';
 // **************************************************************************
 
 DataModel _$DataModelFromJson(Map<String, dynamic> json) => DataModel(
-      days: (json['days'] as List<dynamic>?)
-              ?.map((e) => PeakDataDay.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
       city: json['city'] as String,
       state: json['state'] as String,
       stateCode: json['stateCode'] as String,
       country: json['country'] as String,
       countryCode: json['countryCode'] as String,
-      electricityCompany: PeakDataElectricityCompany.fromJson(
-          json['electricityCompany'] as Map<String, dynamic>),
+      electricityCompanies: (json['electricityCompanies'] as List<dynamic>?)
+              ?.map((e) => PeakDataElectricityCompany.fromJson(
+                  e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
 
 Map<String, dynamic> _$DataModelToJson(DataModel instance) => <String, dynamic>{
-      'days': instance.days.map((e) => e.toJson()).toList(),
       'city': instance.city,
       'state': instance.state,
       'stateCode': instance.stateCode,
       'country': instance.country,
       'countryCode': instance.countryCode,
-      'electricityCompany': instance.electricityCompany.toJson(),
+      'electricityCompanies':
+          instance.electricityCompanies.map((e) => e.toJson()).toList(),
     };
 
 PeakDataDay _$PeakDataDayFromJson(Map<String, dynamic> json) => PeakDataDay(
@@ -49,6 +48,10 @@ PeakDataElectricityCompany _$PeakDataElectricityCompanyFromJson(
     PeakDataElectricityCompany(
       name: json['name'] as String,
       url: json['url'] as String,
+      days: (json['days'] as List<dynamic>?)
+              ?.map((e) => PeakDataDay.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
 
 Map<String, dynamic> _$PeakDataElectricityCompanyToJson(
@@ -56,6 +59,7 @@ Map<String, dynamic> _$PeakDataElectricityCompanyToJson(
     <String, dynamic>{
       'name': instance.name,
       'url': instance.url,
+      'days': instance.days.map((e) => e.toJson()).toList(),
     };
 
 PeakDataEntry _$PeakDataEntryFromJson(Map<String, dynamic> json) =>
