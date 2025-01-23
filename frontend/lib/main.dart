@@ -2,17 +2,25 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/generated/spec.swagger.dart';
 import 'package:frontend/lib.dart';
+import 'package:frontend/location.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 late final String apiUrl;
 
 void main() async {
-  await dotenv.load();
-  apiUrl = dotenv.env['API_URL'] ?? '';
+  if (kIsWeb && kReleaseMode) {
+    apiUrl = Uri.base.toString();
+  } else {
+    await dotenv.load();
+    apiUrl = dotenv.env['API_URL'] ?? '';
+  }
+
   if (apiUrl.isEmpty) {
     throw Exception('Unable to load API URL');
   }
@@ -45,14 +53,25 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+typedef MyHomePageData = ({
+  DataModel peakData,
+  Position position,
+});
+
 class _MyHomePageState extends State<MyHomePage> {
-  late Future<DataModel> peakData;
+  late Future<MyHomePageData> pageData;
   final dataSpec = Spec.create(baseUrl: Uri.parse(apiUrl));
 
   @override
   void initState() {
     super.initState();
-    peakData = getData();
+    pageData = getHomePageData();
+  }
+
+  Future<MyHomePageData> getHomePageData() async {
+    final data = await getData();
+    final pos = await determinePosition();
+    return (peakData: data, position: pos);
   }
 
   Future<DataModel> getData() async {
@@ -66,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void reloadData() {
     setState(() {
-      peakData = getData();
+      pageData = getHomePageData();
     });
   }
 
@@ -81,12 +100,16 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: FutureBuilder(
-          future: peakData,
+          future: pageData,
           builder: (context, snapshot) {
             Widget child;
-            DataModel? data = snapshot.data;
-            if (snapshot.hasData && data != null) {
-              child = Dial(data: data);
+            DataModel? data = snapshot.data?.peakData;
+            Position? position = snapshot.data?.position;
+            if (snapshot.hasData && data != null && position != null) {
+              child = Dial(
+                data: data,
+                position: position,
+              );
             } else if (snapshot.hasError) {
               child = Center(
                 child: Column(
@@ -97,10 +120,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: Colors.red,
                       size: 60,
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 16),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
                       child: Text(
-                          'Error: Unable to load data. Please try again later.'),
+                          'Error: Unable to load data. Please try again later.\n${snapshot.error}'),
                     ),
                     ElevatedButton(
                       onPressed: reloadData,
@@ -164,9 +187,10 @@ class MyPainter extends CustomPainter {
 }
 
 class Dial extends StatefulWidget {
-  const Dial({super.key, required this.data});
+  const Dial({super.key, required this.data, required this.position});
 
   final DataModel data;
+  final Position position;
 
   @override
   State<Dial> createState() => _DialState();
@@ -187,9 +211,12 @@ class _DialState extends State<Dial> {
     setState(() {
       final dateTime = DateTime.now();
       if (lastWeekday != dateTime.weekday) {
-        final peakDataEntry =
+        final peakDataEntries =
             getPeakDataEntriesForWeekday(data, dateTime, dateTime.weekday);
-        allPeakTimes = parsePeakData(peakDataEntry);
+        if (peakDataEntries == null) {
+          throw Exception('Invalid peak data');
+        }
+        allPeakTimes = parsePeakData(peakDataEntries);
       }
 
       var currentPeakIndex = allPeakTimes.indexWhere(
@@ -197,13 +224,18 @@ class _DialState extends State<Dial> {
       );
       var nextPeakIndex = currentPeakIndex + 1;
       var nextPeakTimes = allPeakTimes;
-      if (currentPeakIndex < 0) {
+      final isLast =
+          currentPeakIndex < 0 || currentPeakIndex == allPeakTimes.length - 1;
+      if (isLast) {
         currentPeakIndex = allPeakTimes.length - 1;
         final nextPeakData = getPeakDataEntriesForWeekday(
           data,
           dateTime,
           getNextWeekday(dateTime.weekday),
         );
+        if (nextPeakData == null) {
+          throw Exception('Invalid next peak data');
+        }
         nextPeakTimes = parsePeakData(nextPeakData);
         nextPeakIndex = 0;
       }

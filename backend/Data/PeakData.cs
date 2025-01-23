@@ -153,7 +153,7 @@ namespace backend.Data {
           },
           new() // Sunday
           {
-            DayOfWeek = 6,
+            DayOfWeek = 7,
             Entries = [
               new()
               {
@@ -324,7 +324,7 @@ namespace backend.Data {
           },
           new() // Sunday
           {
-            DayOfWeek = 6,
+            DayOfWeek = 7,
             Entries = [
               new()
               {

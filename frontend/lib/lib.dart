@@ -10,12 +10,12 @@ int getNextWeekday(int weekday) {
 
 const winterMonths = [11, 12, 1, 2, 3, 4];
 
-List<PeakDataEntry> getPeakDataEntriesForWeekday(
+List<PeakDataEntry>? getPeakDataEntriesForWeekday(
     DataModel data, DateTime dateTime, int weekday) {
   return data.data
       .where((peakDataDay) => peakDataDay.dayOfWeek == weekday)
-      .first
-      .entries;
+      .firstOrNull
+      ?.entries;
 }
 
 typedef ParsedPeakData = ({
