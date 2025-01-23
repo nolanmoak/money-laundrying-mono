@@ -15,19 +15,10 @@
         "tags": ["Data"],
         "parameters": [
           {
-            "name": "latitude",
+            "name": "companyId",
             "in": "query",
             "schema": {
-              "type": "number",
-              "format": "float"
-            }
-          },
-          {
-            "name": "longitude",
-            "in": "query",
-            "schema": {
-              "type": "number",
-              "format": "float"
+              "type": "string"
             }
           }
         ],
@@ -54,21 +45,108 @@
           }
         }
       }
+    },
+    "/api/Location/companies/flat": {
+      "get": {
+        "tags": ["Location"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationAndCompanyModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationAndCompanyModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationAndCompanyModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Location/current": {
+      "get": {
+        "tags": ["Location"],
+        "parameters": [
+          {
+            "name": "latitude",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
       "DataModel": {
+        "required": ["days"],
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PeakDataDay"
+            }
+          }
+        }
+      },
+      "Location": {
         "required": [
+          "id",
           "city",
           "state",
           "stateCode",
           "country",
-          "countryCode",
-          "electricityCompanies"
+          "countryCode"
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
           "city": {
             "type": "string"
           },
@@ -83,11 +161,29 @@
           },
           "countryCode": {
             "type": "string"
+          }
+        }
+      },
+      "LocationAndCompany": {
+        "required": ["location", "company"],
+        "type": "object",
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/Location"
           },
-          "electricityCompanies": {
+          "company": {
+            "$ref": "#/components/schemas/PeakDataElecitricityCompanyMinimal"
+          }
+        }
+      },
+      "LocationAndCompanyModel": {
+        "required": ["locationsAndCompanies"],
+        "type": "object",
+        "properties": {
+          "locationsAndCompanies": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/PeakDataElectricityCompany"
+              "$ref": "#/components/schemas/LocationAndCompany"
             }
           }
         }
@@ -108,21 +204,18 @@
           }
         }
       },
-      "PeakDataElectricityCompany": {
-        "required": ["name", "url", "days"],
+      "PeakDataElecitricityCompanyMinimal": {
+        "required": ["id", "name", "url"],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
           "name": {
             "type": "string"
           },
           "url": {
             "type": "string"
-          },
-          "days": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PeakDataDay"
-            }
           }
         }
       },
@@ -164,6 +257,9 @@
   "tags": [
     {
       "name": "Data"
+    },
+    {
+      "name": "Location"
     }
   ]
 }

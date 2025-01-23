@@ -47,22 +47,50 @@ abstract class Spec extends ChopperService {
   }
 
   ///
+  ///@param companyId
+  Future<chopper.Response<DataModel>> apiDataGet({String? companyId}) {
+    generatedMapping.putIfAbsent(DataModel, () => DataModel.fromJsonFactory);
+
+    return _apiDataGet(companyId: companyId);
+  }
+
+  ///
+  ///@param companyId
+  @Get(path: '/api/Data')
+  Future<chopper.Response<DataModel>> _apiDataGet(
+      {@Query('companyId') String? companyId});
+
+  ///
+  Future<chopper.Response<LocationAndCompanyModel>>
+      apiLocationCompaniesFlatGet() {
+    generatedMapping.putIfAbsent(
+        LocationAndCompanyModel, () => LocationAndCompanyModel.fromJsonFactory);
+
+    return _apiLocationCompaniesFlatGet();
+  }
+
+  ///
+  @Get(path: '/api/Location/companies/flat')
+  Future<chopper.Response<LocationAndCompanyModel>>
+      _apiLocationCompaniesFlatGet();
+
+  ///
   ///@param latitude
   ///@param longitude
-  Future<chopper.Response<DataModel>> apiDataGet({
+  Future<chopper.Response<Location>> apiLocationCurrentGet({
     num? latitude,
     num? longitude,
   }) {
-    generatedMapping.putIfAbsent(DataModel, () => DataModel.fromJsonFactory);
+    generatedMapping.putIfAbsent(Location, () => Location.fromJsonFactory);
 
-    return _apiDataGet(latitude: latitude, longitude: longitude);
+    return _apiLocationCurrentGet(latitude: latitude, longitude: longitude);
   }
 
   ///
   ///@param latitude
   ///@param longitude
-  @Get(path: '/api/Data')
-  Future<chopper.Response<DataModel>> _apiDataGet({
+  @Get(path: '/api/Location/current')
+  Future<chopper.Response<Location>> _apiLocationCurrentGet({
     @Query('latitude') num? latitude,
     @Query('longitude') num? longitude,
   });
@@ -71,12 +99,7 @@ abstract class Spec extends ChopperService {
 @JsonSerializable(explicitToJson: true)
 class DataModel {
   const DataModel({
-    required this.city,
-    required this.state,
-    required this.stateCode,
-    required this.country,
-    required this.countryCode,
-    required this.electricityCompanies,
+    required this.days,
   });
 
   factory DataModel.fromJson(Map<String, dynamic> json) =>
@@ -85,6 +108,55 @@ class DataModel {
   static const toJsonFactory = _$DataModelToJson;
   Map<String, dynamic> toJson() => _$DataModelToJson(this);
 
+  @JsonKey(name: 'days', includeIfNull: true, defaultValue: <PeakDataDay>[])
+  final List<PeakDataDay> days;
+  static const fromJsonFactory = _$DataModelFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is DataModel &&
+            (identical(other.days, days) ||
+                const DeepCollectionEquality().equals(other.days, days)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(days) ^ runtimeType.hashCode;
+}
+
+extension $DataModelExtension on DataModel {
+  DataModel copyWith({List<PeakDataDay>? days}) {
+    return DataModel(days: days ?? this.days);
+  }
+
+  DataModel copyWithWrapped({Wrapped<List<PeakDataDay>>? days}) {
+    return DataModel(days: (days != null ? days.value : this.days));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class Location {
+  const Location({
+    required this.id,
+    required this.city,
+    required this.state,
+    required this.stateCode,
+    required this.country,
+    required this.countryCode,
+  });
+
+  factory Location.fromJson(Map<String, dynamic> json) =>
+      _$LocationFromJson(json);
+
+  static const toJsonFactory = _$LocationToJson;
+  Map<String, dynamic> toJson() => _$LocationToJson(this);
+
+  @JsonKey(name: 'id', includeIfNull: true)
+  final String id;
   @JsonKey(name: 'city', includeIfNull: true)
   final String city;
   @JsonKey(name: 'state', includeIfNull: true)
@@ -95,17 +167,14 @@ class DataModel {
   final String country;
   @JsonKey(name: 'countryCode', includeIfNull: true)
   final String countryCode;
-  @JsonKey(
-      name: 'electricityCompanies',
-      includeIfNull: true,
-      defaultValue: <PeakDataElectricityCompany>[])
-  final List<PeakDataElectricityCompany> electricityCompanies;
-  static const fromJsonFactory = _$DataModelFromJson;
+  static const fromJsonFactory = _$LocationFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is DataModel &&
+        (other is Location &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.city, city) ||
                 const DeepCollectionEquality().equals(other.city, city)) &&
             (identical(other.state, state) ||
@@ -118,10 +187,7 @@ class DataModel {
                     .equals(other.country, country)) &&
             (identical(other.countryCode, countryCode) ||
                 const DeepCollectionEquality()
-                    .equals(other.countryCode, countryCode)) &&
-            (identical(other.electricityCompanies, electricityCompanies) ||
-                const DeepCollectionEquality()
-                    .equals(other.electricityCompanies, electricityCompanies)));
+                    .equals(other.countryCode, countryCode)));
   }
 
   @override
@@ -129,50 +195,157 @@ class DataModel {
 
   @override
   int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
       const DeepCollectionEquality().hash(city) ^
       const DeepCollectionEquality().hash(state) ^
       const DeepCollectionEquality().hash(stateCode) ^
       const DeepCollectionEquality().hash(country) ^
       const DeepCollectionEquality().hash(countryCode) ^
-      const DeepCollectionEquality().hash(electricityCompanies) ^
       runtimeType.hashCode;
 }
 
-extension $DataModelExtension on DataModel {
-  DataModel copyWith(
-      {String? city,
+extension $LocationExtension on Location {
+  Location copyWith(
+      {String? id,
+      String? city,
       String? state,
       String? stateCode,
       String? country,
-      String? countryCode,
-      List<PeakDataElectricityCompany>? electricityCompanies}) {
-    return DataModel(
+      String? countryCode}) {
+    return Location(
+        id: id ?? this.id,
         city: city ?? this.city,
         state: state ?? this.state,
         stateCode: stateCode ?? this.stateCode,
         country: country ?? this.country,
-        countryCode: countryCode ?? this.countryCode,
-        electricityCompanies:
-            electricityCompanies ?? this.electricityCompanies);
+        countryCode: countryCode ?? this.countryCode);
   }
 
-  DataModel copyWithWrapped(
-      {Wrapped<String>? city,
+  Location copyWithWrapped(
+      {Wrapped<String>? id,
+      Wrapped<String>? city,
       Wrapped<String>? state,
       Wrapped<String>? stateCode,
       Wrapped<String>? country,
-      Wrapped<String>? countryCode,
-      Wrapped<List<PeakDataElectricityCompany>>? electricityCompanies}) {
-    return DataModel(
+      Wrapped<String>? countryCode}) {
+    return Location(
+        id: (id != null ? id.value : this.id),
         city: (city != null ? city.value : this.city),
         state: (state != null ? state.value : this.state),
         stateCode: (stateCode != null ? stateCode.value : this.stateCode),
         country: (country != null ? country.value : this.country),
         countryCode:
-            (countryCode != null ? countryCode.value : this.countryCode),
-        electricityCompanies: (electricityCompanies != null
-            ? electricityCompanies.value
-            : this.electricityCompanies));
+            (countryCode != null ? countryCode.value : this.countryCode));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class LocationAndCompany {
+  const LocationAndCompany({
+    required this.location,
+    required this.company,
+  });
+
+  factory LocationAndCompany.fromJson(Map<String, dynamic> json) =>
+      _$LocationAndCompanyFromJson(json);
+
+  static const toJsonFactory = _$LocationAndCompanyToJson;
+  Map<String, dynamic> toJson() => _$LocationAndCompanyToJson(this);
+
+  @JsonKey(name: 'location', includeIfNull: true)
+  final Location location;
+  @JsonKey(name: 'company', includeIfNull: true)
+  final PeakDataElecitricityCompanyMinimal company;
+  static const fromJsonFactory = _$LocationAndCompanyFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is LocationAndCompany &&
+            (identical(other.location, location) ||
+                const DeepCollectionEquality()
+                    .equals(other.location, location)) &&
+            (identical(other.company, company) ||
+                const DeepCollectionEquality().equals(other.company, company)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(location) ^
+      const DeepCollectionEquality().hash(company) ^
+      runtimeType.hashCode;
+}
+
+extension $LocationAndCompanyExtension on LocationAndCompany {
+  LocationAndCompany copyWith(
+      {Location? location, PeakDataElecitricityCompanyMinimal? company}) {
+    return LocationAndCompany(
+        location: location ?? this.location, company: company ?? this.company);
+  }
+
+  LocationAndCompany copyWithWrapped(
+      {Wrapped<Location>? location,
+      Wrapped<PeakDataElecitricityCompanyMinimal>? company}) {
+    return LocationAndCompany(
+        location: (location != null ? location.value : this.location),
+        company: (company != null ? company.value : this.company));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class LocationAndCompanyModel {
+  const LocationAndCompanyModel({
+    required this.locationsAndCompanies,
+  });
+
+  factory LocationAndCompanyModel.fromJson(Map<String, dynamic> json) =>
+      _$LocationAndCompanyModelFromJson(json);
+
+  static const toJsonFactory = _$LocationAndCompanyModelToJson;
+  Map<String, dynamic> toJson() => _$LocationAndCompanyModelToJson(this);
+
+  @JsonKey(
+      name: 'locationsAndCompanies',
+      includeIfNull: true,
+      defaultValue: <LocationAndCompany>[])
+  final List<LocationAndCompany> locationsAndCompanies;
+  static const fromJsonFactory = _$LocationAndCompanyModelFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is LocationAndCompanyModel &&
+            (identical(other.locationsAndCompanies, locationsAndCompanies) ||
+                const DeepCollectionEquality().equals(
+                    other.locationsAndCompanies, locationsAndCompanies)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(locationsAndCompanies) ^
+      runtimeType.hashCode;
+}
+
+extension $LocationAndCompanyModelExtension on LocationAndCompanyModel {
+  LocationAndCompanyModel copyWith(
+      {List<LocationAndCompany>? locationsAndCompanies}) {
+    return LocationAndCompanyModel(
+        locationsAndCompanies:
+            locationsAndCompanies ?? this.locationsAndCompanies);
+  }
+
+  LocationAndCompanyModel copyWithWrapped(
+      {Wrapped<List<LocationAndCompany>>? locationsAndCompanies}) {
+    return LocationAndCompanyModel(
+        locationsAndCompanies: (locationsAndCompanies != null
+            ? locationsAndCompanies.value
+            : this.locationsAndCompanies));
   }
 }
 
@@ -233,37 +406,39 @@ extension $PeakDataDayExtension on PeakDataDay {
 }
 
 @JsonSerializable(explicitToJson: true)
-class PeakDataElectricityCompany {
-  const PeakDataElectricityCompany({
+class PeakDataElecitricityCompanyMinimal {
+  const PeakDataElecitricityCompanyMinimal({
+    required this.id,
     required this.name,
     required this.url,
-    required this.days,
   });
 
-  factory PeakDataElectricityCompany.fromJson(Map<String, dynamic> json) =>
-      _$PeakDataElectricityCompanyFromJson(json);
+  factory PeakDataElecitricityCompanyMinimal.fromJson(
+          Map<String, dynamic> json) =>
+      _$PeakDataElecitricityCompanyMinimalFromJson(json);
 
-  static const toJsonFactory = _$PeakDataElectricityCompanyToJson;
-  Map<String, dynamic> toJson() => _$PeakDataElectricityCompanyToJson(this);
+  static const toJsonFactory = _$PeakDataElecitricityCompanyMinimalToJson;
+  Map<String, dynamic> toJson() =>
+      _$PeakDataElecitricityCompanyMinimalToJson(this);
 
+  @JsonKey(name: 'id', includeIfNull: true)
+  final String id;
   @JsonKey(name: 'name', includeIfNull: true)
   final String name;
   @JsonKey(name: 'url', includeIfNull: true)
   final String url;
-  @JsonKey(name: 'days', includeIfNull: true, defaultValue: <PeakDataDay>[])
-  final List<PeakDataDay> days;
-  static const fromJsonFactory = _$PeakDataElectricityCompanyFromJson;
+  static const fromJsonFactory = _$PeakDataElecitricityCompanyMinimalFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is PeakDataElectricityCompany &&
+        (other is PeakDataElecitricityCompanyMinimal &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.name, name) ||
                 const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.url, url) ||
-                const DeepCollectionEquality().equals(other.url, url)) &&
-            (identical(other.days, days) ||
-                const DeepCollectionEquality().equals(other.days, days)));
+                const DeepCollectionEquality().equals(other.url, url)));
   }
 
   @override
@@ -271,27 +446,26 @@ class PeakDataElectricityCompany {
 
   @override
   int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
       const DeepCollectionEquality().hash(name) ^
       const DeepCollectionEquality().hash(url) ^
-      const DeepCollectionEquality().hash(days) ^
       runtimeType.hashCode;
 }
 
-extension $PeakDataElectricityCompanyExtension on PeakDataElectricityCompany {
-  PeakDataElectricityCompany copyWith(
-      {String? name, String? url, List<PeakDataDay>? days}) {
-    return PeakDataElectricityCompany(
-        name: name ?? this.name, url: url ?? this.url, days: days ?? this.days);
+extension $PeakDataElecitricityCompanyMinimalExtension
+    on PeakDataElecitricityCompanyMinimal {
+  PeakDataElecitricityCompanyMinimal copyWith(
+      {String? id, String? name, String? url}) {
+    return PeakDataElecitricityCompanyMinimal(
+        id: id ?? this.id, name: name ?? this.name, url: url ?? this.url);
   }
 
-  PeakDataElectricityCompany copyWithWrapped(
-      {Wrapped<String>? name,
-      Wrapped<String>? url,
-      Wrapped<List<PeakDataDay>>? days}) {
-    return PeakDataElectricityCompany(
+  PeakDataElecitricityCompanyMinimal copyWithWrapped(
+      {Wrapped<String>? id, Wrapped<String>? name, Wrapped<String>? url}) {
+    return PeakDataElecitricityCompanyMinimal(
+        id: (id != null ? id.value : this.id),
         name: (name != null ? name.value : this.name),
-        url: (url != null ? url.value : this.url),
-        days: (days != null ? days.value : this.days));
+        url: (url != null ? url.value : this.url));
   }
 }
 

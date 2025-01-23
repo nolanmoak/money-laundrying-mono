@@ -43,6 +43,7 @@ dependencies:
   geolocator_web: ^4.1.1
   url_launcher: ^6.3.1
   intl: ^0.20.1
+  dropdown_search: ^6.0.2
   
 
 dev_dependencies:

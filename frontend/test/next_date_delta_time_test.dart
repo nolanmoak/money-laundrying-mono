@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frontend/lib.dart';
+import 'package:frontend/utils/date_utils.dart';
 
 void main() {
   test('Delta time works', () {

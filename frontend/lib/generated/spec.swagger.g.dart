@@ -7,26 +7,62 @@ part of 'spec.swagger.dart';
 // **************************************************************************
 
 DataModel _$DataModelFromJson(Map<String, dynamic> json) => DataModel(
-      city: json['city'] as String,
-      state: json['state'] as String,
-      stateCode: json['stateCode'] as String,
-      country: json['country'] as String,
-      countryCode: json['countryCode'] as String,
-      electricityCompanies: (json['electricityCompanies'] as List<dynamic>?)
-              ?.map((e) => PeakDataElectricityCompany.fromJson(
-                  e as Map<String, dynamic>))
+      days: (json['days'] as List<dynamic>?)
+              ?.map((e) => PeakDataDay.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
     );
 
 Map<String, dynamic> _$DataModelToJson(DataModel instance) => <String, dynamic>{
+      'days': instance.days.map((e) => e.toJson()).toList(),
+    };
+
+Location _$LocationFromJson(Map<String, dynamic> json) => Location(
+      id: json['id'] as String,
+      city: json['city'] as String,
+      state: json['state'] as String,
+      stateCode: json['stateCode'] as String,
+      country: json['country'] as String,
+      countryCode: json['countryCode'] as String,
+    );
+
+Map<String, dynamic> _$LocationToJson(Location instance) => <String, dynamic>{
+      'id': instance.id,
       'city': instance.city,
       'state': instance.state,
       'stateCode': instance.stateCode,
       'country': instance.country,
       'countryCode': instance.countryCode,
-      'electricityCompanies':
-          instance.electricityCompanies.map((e) => e.toJson()).toList(),
+    };
+
+LocationAndCompany _$LocationAndCompanyFromJson(Map<String, dynamic> json) =>
+    LocationAndCompany(
+      location: Location.fromJson(json['location'] as Map<String, dynamic>),
+      company: PeakDataElecitricityCompanyMinimal.fromJson(
+          json['company'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$LocationAndCompanyToJson(LocationAndCompany instance) =>
+    <String, dynamic>{
+      'location': instance.location.toJson(),
+      'company': instance.company.toJson(),
+    };
+
+LocationAndCompanyModel _$LocationAndCompanyModelFromJson(
+        Map<String, dynamic> json) =>
+    LocationAndCompanyModel(
+      locationsAndCompanies: (json['locationsAndCompanies'] as List<dynamic>?)
+              ?.map(
+                  (e) => LocationAndCompany.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+
+Map<String, dynamic> _$LocationAndCompanyModelToJson(
+        LocationAndCompanyModel instance) =>
+    <String, dynamic>{
+      'locationsAndCompanies':
+          instance.locationsAndCompanies.map((e) => e.toJson()).toList(),
     };
 
 PeakDataDay _$PeakDataDayFromJson(Map<String, dynamic> json) => PeakDataDay(
@@ -43,23 +79,20 @@ Map<String, dynamic> _$PeakDataDayToJson(PeakDataDay instance) =>
       'entries': instance.entries.map((e) => e.toJson()).toList(),
     };
 
-PeakDataElectricityCompany _$PeakDataElectricityCompanyFromJson(
+PeakDataElecitricityCompanyMinimal _$PeakDataElecitricityCompanyMinimalFromJson(
         Map<String, dynamic> json) =>
-    PeakDataElectricityCompany(
+    PeakDataElecitricityCompanyMinimal(
+      id: json['id'] as String,
       name: json['name'] as String,
       url: json['url'] as String,
-      days: (json['days'] as List<dynamic>?)
-              ?.map((e) => PeakDataDay.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
     );
 
-Map<String, dynamic> _$PeakDataElectricityCompanyToJson(
-        PeakDataElectricityCompany instance) =>
+Map<String, dynamic> _$PeakDataElecitricityCompanyMinimalToJson(
+        PeakDataElecitricityCompanyMinimal instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'name': instance.name,
       'url': instance.url,
-      'days': instance.days.map((e) => e.toJson()).toList(),
     };
 
 PeakDataEntry _$PeakDataEntryFromJson(Map<String, dynamic> json) =>

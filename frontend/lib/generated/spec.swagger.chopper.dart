@@ -19,11 +19,38 @@ final class _$Spec extends Spec {
   final Type definitionType = Spec;
 
   @override
-  Future<Response<DataModel>> _apiDataGet({
+  Future<Response<DataModel>> _apiDataGet({String? companyId}) {
+    final Uri $url = Uri.parse('/api/Data');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'companyId': companyId
+    };
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<DataModel, DataModel>($request);
+  }
+
+  @override
+  Future<Response<LocationAndCompanyModel>> _apiLocationCompaniesFlatGet() {
+    final Uri $url = Uri.parse('/api/Location/companies/flat');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client
+        .send<LocationAndCompanyModel, LocationAndCompanyModel>($request);
+  }
+
+  @override
+  Future<Response<Location>> _apiLocationCurrentGet({
     num? latitude,
     num? longitude,
   }) {
-    final Uri $url = Uri.parse('/api/Data');
+    final Uri $url = Uri.parse('/api/Location/current');
     final Map<String, dynamic> $params = <String, dynamic>{
       'latitude': latitude,
       'longitude': longitude,
@@ -34,6 +61,6 @@ final class _$Spec extends Spec {
       client.baseUrl,
       parameters: $params,
     );
-    return client.send<DataModel, DataModel>($request);
+    return client.send<Location, Location>($request);
   }
 }
