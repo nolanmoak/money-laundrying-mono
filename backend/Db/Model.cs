@@ -18,15 +18,42 @@ namespace backend.Db {
     On,
   }
 
-  [Index(nameof(City), IsUnique = true)]
+  [Index(nameof(City), [nameof(CountryCode)], IsUnique = true), Index(nameof(ElectricityCompanyId), IsUnique = true)]
   public class PeakDataLocation : IId {
     [StringLength(100)]
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     [StringLength(255)]
     public required string City { get; set; }
+    [StringLength(255)]
+    public required string State { get; set; }
+
+    [StringLength(255)]
+    public required string StateCode { get; set; }
+
+    [StringLength(255)]
+    public required string Country { get; set; }
+
+    [StringLength(255)]
+    public required string CountryCode { get; set; }
+
+    public ElectricityCompany ElectricityCompany { get; set; } = null!;
+
+    [StringLength(100)]
+    public string ElectricityCompanyId { get; set; } = null!;
 
     public ICollection<PeakDataLocationSeason> Seasons { get; } = [];
+  }
+
+  public class ElectricityCompany : IId {
+    [StringLength(100)]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    [StringLength(255)]
+    public required string Name { get; set; }
+    [StringLength(255)]
+    public required string Url { get; set; }
+
+    public PeakDataLocation? Location { get; set; }
   }
 
   [Index(nameof(LocationId), [nameof(Season)], IsUnique = true)]

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 namespace backend.Db {
 
   public class ApplicationDbContext : DbContext {
+    public DbSet<ElectricityCompany> ElectricityCompanies { get; set; }
     public DbSet<PeakDataLocation> Locations { get; set; }
     public DbSet<PeakDataLocationSeason> LocationSeasons { get; set; }
     public DbSet<PeakDataLocationSeasonDay> LocationSeasonDays { get; set; }

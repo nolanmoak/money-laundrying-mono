@@ -5,20 +5,33 @@ namespace backend.Db {
   public static class Seeder {
     public static async Task Seed(DbContext context, CancellationToken cancellationToken = default) {
       Console.WriteLine("Starting Seeder...");
-      PeakDataLocation location = new() {
-        City = "Ottawa",
+      ElectricityCompany hydroOttawa = new() {
+        Name = "Hydro Ottawa",
+        Url = "https://hydroottawa.com/en/accounts-services/accounts/rates-conditions/electricity-charge",
       };
-      await context.Set<PeakDataLocation>().AddAsync(location);
+      await context.Set<ElectricityCompany>().AddAsync(hydroOttawa);
       await context.SaveChangesAsync();
-      Console.WriteLine($"Added location: {location}");
+      Console.WriteLine($"Added hydro ottawa: {hydroOttawa}");
+
+      PeakDataLocation ottawaLocation = new() {
+        City = "Ottawa",
+        State = "Ontario",
+        StateCode = "ON",
+        Country = "Canada",
+        CountryCode = "CA",
+        ElectricityCompany = hydroOttawa,
+      };
+      await context.Set<PeakDataLocation>().AddAsync(ottawaLocation);
+      await context.SaveChangesAsync();
+      Console.WriteLine($"Added ottawa location: {ottawaLocation}");
 
       List<PeakDataLocationSeason> seasons = [
         new() {
-          Location = location,
+          Location = ottawaLocation,
           Season = PeakDataSeason.Winter,
         },
         new() {
-          Location = location,
+          Location = ottawaLocation,
           Season = PeakDataSeason.Summer,
         },
       ];

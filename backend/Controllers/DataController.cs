@@ -22,22 +22,41 @@ namespace backend.Controllers {
     [HttpGet()]
     public async Task<ActionResult<DataModel>> Get(float? latitude, float? longitude) {
       var dateTime = DateTime.Now;
+      GeocodingResponse? geoLocationResponse = null;
+
+      var ipAddress = HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
 
       if (latitude != null && longitude != null) {
-        var cityTest = await _geocodingService.GetCityFromLatLong(latitude.Value, longitude.Value);
-        _logger.LogInformation(cityTest);
+        geoLocationResponse = await _geocodingService.GetCityFromLatLongAsync(latitude.Value, longitude.Value);
       }
 
-      var city = "Ottawa";
+      if (geoLocationResponse == null && ipAddress != null) {
+        geoLocationResponse = await _geocodingService.GetCityFromIpAsync(ipAddress);
+      }
+
+      if (geoLocationResponse == null) {
+        return NotFound();
+      }
       var season = GetCurrentSeason(dateTime);
 
       var data = await (
         from l in _dbContext.Locations
         join s in _dbContext.LocationSeasons
           on l.Id equals s.LocationId
-        where l.City == city && s.Season == season
+        join elec in _dbContext.ElectricityCompanies
+          on l.ElectricityCompanyId equals elec.Id
+        where l.City == geoLocationResponse.City && l.CountryCode == geoLocationResponse.CountryCode && s.Season == season
         select new DataModel {
-          Data = (
+          ElectricityCompany = new PeakDataElectricityCompany() {
+            Name = elec.Name,
+            Url = elec.Url,
+          },
+          City = l.City,
+          State = l.State,
+          StateCode = l.StateCode,
+          Country = l.Country,
+          CountryCode = l.CountryCode,
+          Days = (
             from d in s.Days
             select new PeakDataDay {
               DayOfWeek = d.Day,

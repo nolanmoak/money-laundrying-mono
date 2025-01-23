@@ -10,6 +10,8 @@ import 'package:frontend/lib.dart';
 import 'package:frontend/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 late final String apiUrl;
 
@@ -204,11 +206,13 @@ class _DialState extends State<Dial> {
   late Color currentPeakColor;
   late String nextPeak;
   late Color nextPeakColor;
+  late String currentTimeText;
   late DeltaTime timeUntilNextPeak;
 
   void _onPeriodicUpdate() {
     setState(() {
       final dateTime = DateTime.now();
+      currentTimeText = DateFormat('EEEE, MMM. dd, h:mm:ss a').format(dateTime);
       if (lastWeekday != dateTime.weekday) {
         final peakDataEntries =
             getPeakDataEntriesForWeekday(data, dateTime, dateTime.weekday);
@@ -254,6 +258,15 @@ class _DialState extends State<Dial> {
     });
   }
 
+  Future<void> _openUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (kIsWeb || (await canLaunchUrl(uri))) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      return Future.error('Could not launch $url');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -271,6 +284,42 @@ class _DialState extends State<Dial> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(currentTimeText, style: const TextStyle(fontSize: 40)),
+            Row(
+              spacing: 8,
+              children: [
+                Row(
+                  spacing: 2,
+                  children: [
+                    const Icon(Icons.location_on, size: 40),
+                    Text(
+                      '${data.city}, ${data.stateCode}, ${data.countryCode}',
+                      style: const TextStyle(fontSize: 40),
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: () => _openUrl(data.electricityCompany.url),
+                  child: Row(
+                    spacing: 2,
+                    children: [
+                      const Icon(Icons.open_in_new, size: 40),
+                      Text(
+                        data.electricityCompany.name,
+                        style: const TextStyle(
+                          fontSize: 40,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
         if (allPeakTimes.isNotEmpty)
           Expanded(
             child: Padding(
