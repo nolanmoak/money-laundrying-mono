@@ -1,11 +1,11 @@
 {
-  "name": "Full-Stack Test",
-  "short_name": "Full-Stack Test",
+  "name": "Money Laundrying",
+  "short_name": "Money Laundrying",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#0175C2",
   "theme_color": "#0175C2",
-  "description": "A new Flutter project.",
+  "description": "Lets lighten the load on laundry! This app will help you reduce electricity cost when doing laundry or using other appliances in your home.",
   "orientation": "portrait-primary",
   "prefer_related_applications": false,
   "icons": [

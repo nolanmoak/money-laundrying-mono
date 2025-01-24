@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/generated/spec.swagger.dart';
+import 'package:money_laundrying_frontend/generated/spec.swagger.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 class LocationCompanyDropdown extends StatefulWidget {

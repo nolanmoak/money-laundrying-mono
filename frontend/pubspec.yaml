@@ -1,5 +1,5 @@
-name: frontend
-description: "A new Flutter project."
+name: money_laundrying_frontend
+description: "Front end application for Money Laundrying."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -44,6 +44,8 @@ dependencies:
   url_launcher: ^6.3.1
   intl: ^0.20.1
   dropdown_search: ^6.0.2
+  universal_html: ^2.2.4
+  geolocator_linux: ^0.2.1
   
 
 dev_dependencies:

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/components/current_time.dart';
-import 'package:frontend/components/dial.dart';
-import 'package:frontend/components/electricity_company_link.dart';
-import 'package:frontend/components/location_company_dropdown.dart';
-import 'package:frontend/generated/spec.swagger.dart';
-import 'package:frontend/services/location_service.dart';
+import 'package:money_laundrying_frontend/components/current_time.dart';
+import 'package:money_laundrying_frontend/components/dial.dart';
+import 'package:money_laundrying_frontend/components/electricity_company_link.dart';
+import 'package:money_laundrying_frontend/components/location_company_dropdown.dart';
+import 'package:money_laundrying_frontend/generated/spec.swagger.dart';
+import 'package:money_laundrying_frontend/services/location_service.dart';
 
 class HomeRoute extends StatefulWidget {
   const HomeRoute({super.key, required this.title, required this.apiUrl});

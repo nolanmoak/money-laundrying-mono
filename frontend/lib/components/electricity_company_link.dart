@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/components/empty.dart';
-import 'package:frontend/generated/spec.swagger.dart';
+import 'package:money_laundrying_frontend/components/empty.dart';
+import 'package:money_laundrying_frontend/generated/spec.swagger.dart';
 import 'package:url_launcher/url_launcher.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
+
+import 'package:universal_html/html.dart' as html;
 
 class ElectricityCompanyLink extends StatelessWidget {
   const ElectricityCompanyLink(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/generated/spec.swagger.dart';
+import 'package:money_laundrying_frontend/generated/spec.swagger.dart';
 
 List<PeakDataEntry>? getPeakDataEntriesForWeekday(
     DataModel data, DateTime dateTime, int weekday) {

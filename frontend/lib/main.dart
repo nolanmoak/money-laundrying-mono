@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:frontend/routes/home_route.dart';
+import 'package:money_laundrying_frontend/routes/home_route.dart';
 
 late final String apiUrl;
 

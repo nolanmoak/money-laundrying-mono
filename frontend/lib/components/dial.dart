@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/components/empty.dart';
-import 'package:frontend/generated/spec.swagger.dart';
-import 'package:frontend/utils/data_utils.dart';
-import 'package:frontend/utils/date_utils.dart';
+import 'package:money_laundrying_frontend/components/empty.dart';
+import 'package:money_laundrying_frontend/generated/spec.swagger.dart';
+import 'package:money_laundrying_frontend/utils/data_utils.dart';
+import 'package:money_laundrying_frontend/utils/date_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Dial extends StatefulWidget {
