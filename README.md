@@ -4,6 +4,8 @@ This is a simple app that visually displays the best time of day to do electrici
 
 It will automatically determine your location, and then display the Off, Mid, and On Peak hours for the your electricity company.
 
+![Alt text](/images/screenshots/money-laundrying-screenshot.jpg?raw=true "Money Laundrying")
+
 ## Currently supported companies
 - Hydro Ottawa (Ottawa, ON, CA)
 
