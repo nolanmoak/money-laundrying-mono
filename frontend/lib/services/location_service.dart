@@ -48,24 +48,29 @@ Future<Position?> determinePosition() async {
   bool serviceEnabled;
   LocationPermission permission;
 
-  serviceEnabled = await GeolocatorPlatform.instance.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return null;
-  }
-
-  permission = await GeolocatorPlatform.instance.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await GeolocatorPlatform.instance.requestPermission();
-    if (permission == LocationPermission.denied) {
+  try {
+    serviceEnabled =
+        await GeolocatorPlatform.instance.isLocationServiceEnabled();
+    if (!serviceEnabled) {
       return null;
     }
-  }
 
-  if (permission == LocationPermission.deniedForever) {
+    permission = await GeolocatorPlatform.instance.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await GeolocatorPlatform.instance.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return null;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return null;
+    }
+
+    return await GeolocatorPlatform.instance.getCurrentPosition(
+      locationSettings: getLocationSettings(),
+    );
+  } catch (e) {
     return null;
   }
-
-  return await GeolocatorPlatform.instance.getCurrentPosition(
-    locationSettings: getLocationSettings(),
-  );
 }

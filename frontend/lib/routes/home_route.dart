@@ -27,7 +27,6 @@ class _HomeRouteState extends State<HomeRoute> {
   void initState() {
     super.initState();
     apiSpec = Spec.create(baseUrl: Uri.parse(widget.apiUrl));
-    // currentPeakData = getPeakData();
     locationsAndCompaniesFlat = getLocationsAndCompaniesFlat();
     currentLocation = getCurrentLocation();
   }
@@ -39,11 +38,12 @@ class _HomeRouteState extends State<HomeRoute> {
     final loc = response.body;
 
     if (loc != null && selectedLocationAndCompany == null) {
-      final allLocationsAndCompanies = await locationsAndCompaniesFlat;
-      selectLocationAndCompany(allLocationsAndCompanies.locationsAndCompanies
-          .where(
-              (locationAndCompany) => locationAndCompany.location.id == loc.id)
-          .first);
+      locationsAndCompaniesFlat.then((allLocationsAndCompanies) {
+        selectLocationAndCompany(allLocationsAndCompanies.locationsAndCompanies
+            .where((locationAndCompany) =>
+                locationAndCompany.location.id == loc.id)
+            .first);
+      });
     }
 
     return loc;
@@ -85,6 +85,8 @@ class _HomeRouteState extends State<HomeRoute> {
       selectedLocationAndCompany = locationAndCompany;
       if (locationAndCompany != null) {
         currentPeakData = getPeakData(locationAndCompany.company.id);
+      } else {
+        currentPeakData = null;
       }
     });
   }
