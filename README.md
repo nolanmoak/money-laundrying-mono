@@ -6,3 +6,11 @@ It will automatically determine your location, and then display the Off, Mid, an
 
 ## Currently supported companies
 - Hydro Ottawa (Ottawa, ON, CA)
+
+## Supported Platforms
+- Web
+- iOS
+- Android
+- MacOS
+- Windows
+- Linux
